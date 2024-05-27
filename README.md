@@ -15,16 +15,22 @@
 
 - Before you start coding create your own branch using
 
-  > git branch <name-of-your-branch>
-  > git checkout <name-of-your-branch>
+  ```
+  git branch <name-of-your-branch>
+  git checkout <name-of-your-branch>
+  ```
 
 - When you are ready to make a pull request
 
-  > git add .
-  > git commit -m "<message-here>"
+  ```
+  git add .
+  git commit -m "<message-here>"
+  ```
 
 - Then push to origin
 
-  > git push origin <name-of-your-branch>
+  ```
+  git push origin <name-of-your-branch>
+  ```
 
 - Go to github click the "Pull Request" button
