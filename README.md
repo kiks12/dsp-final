@@ -2,7 +2,9 @@
 
 ## Installation Instructions
 
-> pip install -r requirement.txt
+```
+pip install -r requirement.txt
+```
 
 ## Guide
 
