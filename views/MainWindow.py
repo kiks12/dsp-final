@@ -8,12 +8,12 @@ from views import Window
 class MainWindow(Window.Window):
 
     window: tk.Tk
-    frame: tk.ttk.Frame
-    adc_button: tk.ttk.Button
-    fir_button: tk.ttk.Button
-    moving_average_button: tk.ttk.Button
-    pass_filter_button: tk.ttk.Button
-    exit_button: tk.ttk.Button
+    frame: tk.Frame
+    adc_button: tk.Button
+    fir_button: tk.Button
+    moving_average_button: tk.Button
+    pass_filter_button: tk.Button
+    exit_button: tk.Button
 
     controller: MainController
 
@@ -31,28 +31,29 @@ class MainWindow(Window.Window):
         self.initialize_buttons()
 
     def initialize_buttons(self):
-        self.frame = tk.ttk.Frame(self.window)
-        self.adc_button = tk.ttk.Button(
+        self.frame = tk.Frame(self.window)
+        self.adc_button = tk.Button(
             self.frame,
             text="Analog to Digital Conversion",
             width=20,
         )
-        self.fir_button = tk.ttk.Button(
+        self.fir_button = tk.Button(
             self.frame,
             text="Finite Impulse Response Filter",
             width=20
         )
-        self.moving_average_button = tk.ttk.Button(
+        self.moving_average_button = tk.Button(
             self.frame,
             text="Moving Average Filter",
-            width=20
+            width=20,
+            command=lambda: self.controller.open_moving_average_window()
         )
-        self.pass_filter_button = tk.ttk.Button(
+        self.pass_filter_button = tk.Button(
             self.frame,
             text="Low-Pass/High-Pass",
             width=20
         )
-        self.exit_button = tk.ttk.Button(
+        self.exit_button = tk.Button(
             self.frame,
             text="Exit",
             width=20,
