@@ -1,6 +1,7 @@
 
-import tkinter as tk
+from views import MainWindow
+from controllers import MainController
 
-window = tk.Tk()
-
-window.mainloop()
+main_controller = MainController()
+main_window = MainWindow.MainWindow(main_controller)
+main_window.start_mainloop()
