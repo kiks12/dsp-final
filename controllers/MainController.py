@@ -17,5 +17,17 @@ class MainController:
         )
         self.moving_average_window.start_mainloop()
 
+    def open_analog_digital_window(self):
+        # kabit yung code for opening new window
+        pass
+
+    def open_fir_window(self):
+        # kabit yung code for opening new window
+        pass
+
+    def open_low_high_window(self):
+        # kabit yung code for opening new window
+        pass
+
     def exit_app(self):
         sys.exit()
