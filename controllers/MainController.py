@@ -15,7 +15,7 @@ class MainController:
         self.moving_average_window = MovingAverageWindow.MovingAverageWindow(
             self.moving_average_controller
         )
-        self.moving_average_window.start_mainloop()
+        self.moving_average_window.mainloop()
 
     def open_analog_digital_window(self):
         # kabit yung code for opening new window
