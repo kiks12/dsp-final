@@ -1,9 +1,6 @@
-
 import sys
-
-from views import MovingAverageWindow
-from controllers import MovingAverageController
-
+from views import MovingAverageWindow, FIRFilterWindow
+from controllers import MovingAverageController, FIRFilterController
 
 class MainController:
 
@@ -22,9 +19,11 @@ class MainController:
         pass
 
     def open_fir_window(self):
-        # kabit yung code for opening new window
-        pass
+        fir_filter_controller = FIRFilterController.FIRFilterController()
+        self.fir_filter_window = FIRFilterWindow.FIRFilterWindow(fir_filter_controller)
+        self.fir_filter_window.mainloop()
 
+        
     def open_low_high_window(self):
         # kabit yung code for opening new window
         pass
