@@ -64,16 +64,23 @@ class FIRFilterController:
 
     def process_audio(self, filename, cutoff):
         if filename:
-            original_audio, samplerate = sf.read(filename)
-            
-            if cutoff <= 0 or cutoff >= samplerate / 2:
-                print("Invalid cutoff frequency. Using default value.")
-                cutoff = 1000 
-            
-            filtered_audio = self.apply_fir_to_audio(original_audio, cutoff, samplerate)
-            adjusted_filtered_audio = self.adjust_amplitude(filtered_audio, cutoff)
-            
-            self.plot_audio(original_audio, adjusted_filtered_audio, samplerate)
+            try:
+                original_audio, samplerate = sf.read(filename)
+                
+                if cutoff <= 0 or cutoff >= samplerate / 2:
+                    print("Invalid cutoff frequency. Using default value.")
+                    cutoff = 1000 
+                
+                filtered_audio = self.apply_fir_to_audio(original_audio, cutoff, samplerate)
+                adjusted_filtered_audio = self.adjust_amplitude(filtered_audio, cutoff)
+                
+                # Play the audio using pygame
+                pygame.mixer.music.load(filename)
+                pygame.mixer.music.play()
+
+                self.plot_audio(original_audio, adjusted_filtered_audio, samplerate)
+            except Exception as e:
+                print("Error playing audio:", e)
 
     def plot_audio(self, original_audio, filtered_audio, samplerate):
         self.figure.clear()
