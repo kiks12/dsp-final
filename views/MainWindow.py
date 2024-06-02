@@ -41,7 +41,7 @@ class MainWindow(customtkinter.CTk):
             self.buttons_frame, text="Digital Signal Processing", font=("Helvetica", 24)
         )
         self.adc_button = customtkinter.CTkButton(
-            self.buttons_frame, text="Analog to Digital Conversion", width=300, height=40, corner_radius=10,
+            self.buttons_frame, text="Analog to Digital Conversion", width=300, height=40, corner_radius=10, command=lambda: self.controller.open_analog_digital_window()
         )
         self.fir_button = customtkinter.CTkButton(
             self.buttons_frame, text="Finite Impulse Response Filter", width=300, height=40, corner_radius=10
