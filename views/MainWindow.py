@@ -44,7 +44,7 @@ class MainWindow(customtkinter.CTk):
             self.buttons_frame, text="Analog to Digital Conversion", width=300, height=40, corner_radius=10,
         )
         self.fir_button = customtkinter.CTkButton(
-            self.buttons_frame, text="Finite Impulse Response Filter", width=300, height=40, corner_radius=10
+            self.buttons_frame, text="Finite Impulse Response Filter", width=300, height=40, corner_radius=10, command=lambda: self.controller.open_fir_window()
         )
         self.moving_average_button = customtkinter.CTkButton(
             self.buttons_frame, text="Moving Average Filter", width=300, height=40, corner_radius=10, command=lambda: self.controller.open_moving_average_window()
