@@ -34,25 +34,53 @@ class FIRFilterController:
     def process_image(self, filename):
         if filename:
             original_image = cv2.imread(filename)
-            filtered_image = self.apply_edge_detection_to_image(original_image)
+            if original_image is None:
+                print("Error: Unable to load the original image.")
+                return
 
-            cv2.imshow('Original Image', original_image)
-            cv2.imshow('Filtered Image', filtered_image)
+            filtered_image = self.apply_edge_detection_to_image(original_image)
+            if filtered_image is None:
+                print("Error: Unable to process the filtered image.")
+                return
+
+            common_height = min(original_image.shape[0], filtered_image.shape[0])
+            common_width = min(original_image.shape[1], filtered_image.shape[1])
+
+            original_image_resized = cv2.resize(original_image, (common_width, common_height))
+            filtered_image_resized = cv2.resize(filtered_image, (common_width, common_height))
+
+            filtered_image_colored = cv2.cvtColor(filtered_image_resized, cv2.COLOR_GRAY2BGR)
+            combined_image = np.hstack((original_image_resized, filtered_image_colored))
+            max_width = 800 
+            if combined_image.shape[1] > max_width:
+                scale_factor = max_width / combined_image.shape[1]
+                combined_image_resized = cv2.resize(combined_image, (0, 0), fx=scale_factor, fy=scale_factor)
+            else:
+                combined_image_resized = combined_image
+
+            cv2.imshow('Original and Filtered Image', combined_image_resized)
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
     def process_audio(self, filename, cutoff):
         if filename:
-            original_audio, samplerate = sf.read(filename)
-            
-            if cutoff <= 0 or cutoff >= samplerate / 2:
-                print("Invalid cutoff frequency. Using default value.")
-                cutoff = 1000 
-            
-            filtered_audio = self.apply_fir_to_audio(original_audio, cutoff, samplerate)
-            adjusted_filtered_audio = self.adjust_amplitude(filtered_audio, cutoff)
-            
-            self.plot_audio(original_audio, adjusted_filtered_audio, samplerate)
+            try:
+                original_audio, samplerate = sf.read(filename)
+                
+                if cutoff <= 0 or cutoff >= samplerate / 2:
+                    print("Invalid cutoff frequency. Using default value.")
+                    cutoff = 1000 
+                
+                filtered_audio = self.apply_fir_to_audio(original_audio, cutoff, samplerate)
+                adjusted_filtered_audio = self.adjust_amplitude(filtered_audio, cutoff)
+                
+                # Play the audio using pygame
+                pygame.mixer.music.load(filename)
+                pygame.mixer.music.play()
+
+                self.plot_audio(original_audio, adjusted_filtered_audio, samplerate)
+            except Exception as e:
+                print("Error playing audio:", e)
 
     def plot_audio(self, original_audio, filtered_audio, samplerate):
         self.figure.clear()
