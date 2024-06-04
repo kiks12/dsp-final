@@ -73,15 +73,18 @@ class lowPassHighPassWindow(ctk.CTk):
 
     def create_filter_form(self):
         ctk.CTkLabel(self.filter_form_frame, text="Cut Off Frequency (Hz)", font=("Helvetica", 16)).pack(pady=10)
-        self.cut_off_slider = ctk.CTkSlider(self.filter_form_frame, from_=1, to=22000, variable=self.cut_off, number_of_steps=22000)
+        self.cut_off_slider = ctk.CTkSlider(self.filter_form_frame, from_=1, to=22000, variable=self.cut_off, command=self.update_cut_off_slider)
         self.cut_off_slider.pack(pady=10)
-        self.cut_off_val_label = ctk.CTkLabel(self.filter_form_frame, textvariable=self.cut_off)
+        self.cut_off_val_label = ctk.CTkLabel(self.filter_form_frame, text="10000")
         self.cut_off_val_label.pack(pady=5)
 
         ctk.CTkButton(self.filter_form_frame, text="Load Audio File", command=self.load_audio_file).pack(pady=10)
         ctk.CTkButton(self.filter_form_frame, text="Low Pass Filter", command=lambda: self.apply_filter('lowpass')).pack(pady=10)
         ctk.CTkButton(self.filter_form_frame, text="High Pass Filter", command=lambda: self.apply_filter('highpass')).pack(pady=10)
         ctk.CTkButton(self.filter_form_frame, text="Save Filtered Audio", command=self.save_filtered_audio).pack(pady=10)
+
+    def update_cut_off_slider(self, value):
+        self.cut_off_val_label.configure(text=f"{int(value)}")
 
     def load_audio_file(self):
         file_path = filedialog.askopenfilename(filetypes=[("WAV files", "*.wav")])
