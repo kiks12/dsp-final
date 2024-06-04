@@ -23,6 +23,9 @@ class MovingAverageWindow(customtkinter.CTk):
         self.random_window = tk.IntVar(self, 2)
         self.import_window = tk.IntVar(self, 2)
 
+        self.import_start = tk.IntVar(self, 0)
+        self.import_end = tk.IntVar(self, 0)
+
         self.initialize_layout()
 
     def initialize_layout(self):
@@ -110,10 +113,10 @@ class MovingAverageWindow(customtkinter.CTk):
         self.x_combobox.set("Please select column for x: ")
         self.y_combobox.set("Please select column for y: ")
         self.import_button = customtkinter.CTkButton(
-            self.import_form_frame, text="Import CSV", command=lambda: self.controller.import_csv(self.x_combobox, self.y_combobox), corner_radius=10, width=self.RANDOM_FORM_WIDTH, height=40
+            self.import_form_frame, text="Import CSV", command=lambda: self.controller.import_csv(self.x_combobox, self.y_combobox, self.import_data_range_slider_start, self.import_data_range_slider_end, self.window_end_label), corner_radius=10, width=self.RANDOM_FORM_WIDTH, height=40
         ).pack(pady=10)
         customtkinter.CTkFrame(
-            self.import_form_frame, width=self.RANDOM_FORM_WIDTH, height=30, fg_color="transparent"
+            self.import_form_frame, width=self.RANDOM_FORM_WIDTH, height=10, fg_color="transparent"
         ).pack()
         customtkinter.CTkLabel(
             self.import_form_frame, text="Select Column (X Values): ", anchor="w", font=("Helvetica", 16), width=self.RANDOM_FORM_WIDTH
@@ -124,11 +127,11 @@ class MovingAverageWindow(customtkinter.CTk):
         ).pack()
         self.y_combobox.pack(pady=10)
         customtkinter.CTkFrame(
-            self.import_form_frame, width=self.RANDOM_FORM_WIDTH, height=50, fg_color="transparent"
+            self.import_form_frame, width=self.RANDOM_FORM_WIDTH, height=20, fg_color="transparent"
         ).pack()
         self.import_show_data_button = customtkinter.CTkButton(
-            self.import_form_frame, text="Plot Data", width=self.RANDOM_FORM_WIDTH, height=40, command=lambda: self.controller.plot_import_values(self.import_plot_frame)
-        ).pack(pady=10)
+            self.import_form_frame, text="Plot Data", width=self.RANDOM_FORM_WIDTH, height=40, command=lambda: self.controller.plot_import_values(self.import_plot_frame, self.import_start.get(), self.import_end.get())
+        ).pack(pady=5)
         self.create_window_form_import()
 
     def create_time_vector_form(self):
@@ -202,6 +205,14 @@ class MovingAverageWindow(customtkinter.CTk):
         self.window_slider.pack()
         self.window_form.pack(pady=15)
 
+    def on_start_slider_change(self, new_value):
+        self.window_start_label.configure(text=f"Start: {int(new_value)}")
+        self.controller.set_new_start_value(new_value)
+
+    def on_end_slider_change(self, new_value):
+        self.window_end_label.configure(text=f"End: {int(new_value)}")
+        self.controller.set_end_start_value(new_value)
+
     def create_window_form_import(self):
         self.window_form_import = customtkinter.CTkFrame(
             self.import_form_frame, width=self.RANDOM_FORM_WIDTH, fg_color="transparent"
@@ -211,11 +222,25 @@ class MovingAverageWindow(customtkinter.CTk):
         self.window_slider_import = customtkinter.CTkSlider(
             self.window_form_import, from_=0, to=100, state="normal", variable=self.import_window, width=self.RANDOM_FORM_WIDTH, command=lambda x: self.window_label_import.configure(text=f"Window: {int(x)}")
         )
+        self.window_start_label = customtkinter.CTkLabel(
+            self.window_form_import, text=f"Start: {int(self.import_start.get())}", font=("Helvetica", 16), anchor="w", width=self.RANDOM_FORM_WIDTH)
+        self.import_data_range_slider_start = customtkinter.CTkSlider(
+            self.window_form_import, from_=0, to=100, variable=self.import_start, width=self.RANDOM_FORM_WIDTH, command=lambda x: self.on_start_slider_change(x)
+        )
+        self.window_end_label = customtkinter.CTkLabel(
+            self.window_form_import, text=f"End: {int(self.import_end.get())}", font=("Helvetica", 16), anchor="w", width=self.RANDOM_FORM_WIDTH)
+        self.import_data_range_slider_end = customtkinter.CTkSlider(
+            self.window_form_import, from_=0, to=100, variable=self.import_end, width=self.RANDOM_FORM_WIDTH, command=lambda x: self.on_end_slider_change(x)
+        )
         self.apply_filter_import_button = customtkinter.CTkButton(
-            self.window_form_import, text="Apply Filter", command=lambda: self.controller.apply_moving_average_filter_import(self.import_window.get(), self.import_plot_frame), width=self.RANDOM_FORM_WIDTH, height=40
+            self.window_form_import, text="Apply Filter", command=lambda: self.controller.apply_moving_average_filter_import(int(self.import_window.get()), self.import_plot_frame, self.import_start.get(), self.import_end.get()), width=self.RANDOM_FORM_WIDTH, height=40
         )
         self.window_label_import.pack()
         self.window_slider_import.pack()
+        self.window_start_label.pack()
+        self.import_data_range_slider_start.pack()
+        self.window_end_label.pack()
+        self.import_data_range_slider_end.pack()
         self.apply_filter_import_button.pack(pady=10)
         self.window_form_import.pack(pady=15)
 
