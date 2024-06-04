@@ -16,9 +16,11 @@ class AnalogToDigitalWindow(ctk.CTk):
         self.resizable(False, False)
 
         self.controller = controller
-        self.time_vector = tk.IntVar(value=50)
-        self.sampling_interval = tk.IntVar(value=1)
-        self.bit_depth = tk.IntVar(value=8)
+        self.time_vector = tk.IntVar(value=75)
+        self.random_sampling_interval = tk.IntVar(value=1)
+        self.import_sampling_interval = tk.IntVar(value=1)
+        self.random_bit_depth = tk.IntVar(value=8)
+        self.import_bit_depth = tk.IntVar(value=8)
         self.file_path = None
 
         self.initialize_layout()
@@ -84,46 +86,69 @@ class AnalogToDigitalWindow(ctk.CTk):
 
     def create_random_form(self):
         ctk.CTkLabel(self.random_form_frame, text="Time Vector", font=("Helvetica", 16)).pack(pady=10)
-        self.time_vector_slider = ctk.CTkSlider(self.random_form_frame, from_=1, to=100, variable=self.time_vector, number_of_steps=100)
+        self.time_vector_slider = ctk.CTkSlider(self.random_form_frame, from_=50, to=100, variable=self.time_vector, command=self.update_time_vector_label)
         self.time_vector_slider.pack(pady=10)
-        self.time_vector_label = ctk.CTkLabel(self.random_form_frame, textvariable=self.time_vector)
-        self.time_vector_label.pack(pady=5)
+        self.random_time_vector_label = ctk.CTkLabel(self.random_form_frame, text="75")
+        self.random_time_vector_label.pack(pady=5)
 
         ctk.CTkLabel(self.random_form_frame, text="Sampling Interval", font=("Helvetica", 16)).pack(pady=10)
-        self.sampling_slider = ctk.CTkSlider(self.random_form_frame, from_=1, to=10, variable=self.sampling_interval)
-        self.sampling_slider.pack(pady=10)
-        self.sampling_val_label = ctk.CTkLabel(self.random_form_frame, textvariable=self.sampling_interval)
-        self.sampling_val_label.pack(pady=5)
+        self.random_sampling_slider = ctk.CTkSlider(self.random_form_frame, from_=1, to=10, variable=self.random_sampling_interval, command=self.update_random_sampling_val_label)
+        self.random_sampling_slider.pack(pady=10)
+        self.random_sampling_val_label = ctk.CTkLabel(self.random_form_frame, text="1")
+        self.random_sampling_val_label.pack(pady=5)
 
         ctk.CTkLabel(self.random_form_frame, text="Bit Depth", font=("Helvetica", 16)).pack(pady=10)
-        self.bit_depth_slider = ctk.CTkSlider(self.random_form_frame, from_=1, to=16, variable=self.bit_depth, number_of_steps=16)
-        self.bit_depth_slider.pack(pady=10)
-        self.bit_depth_label = ctk.CTkLabel(self.random_form_frame, textvariable=self.bit_depth)
-        self.bit_depth_label.pack(pady=5)
+        self.random_bit_depth_slider = ctk.CTkSlider(self.random_form_frame, from_=1, to=16, variable=self.random_bit_depth, command=self.update_random_bit_depth_label)
+        self.random_bit_depth_slider.pack(pady=10)
+        self.random_bit_depth_label = ctk.CTkLabel(self.random_form_frame, text="8")
+        self.random_bit_depth_label.pack(pady=5)
 
         ctk.CTkButton(self.random_form_frame, text="Generate Random Signal", command=self.generate_random_signal).pack(pady=10)
         ctk.CTkButton(self.random_form_frame, text="Analog to Digital Conversion", command=lambda: self.analog_to_digital_conversion(self.analog_signal, self.random_plot_frame)).pack(pady=10)
 
+
     def create_import_form(self):
         ctk.CTkLabel(self.import_form_frame, text="Sampling Interval", font=("Helvetica", 16)).pack(pady=10)
-        self.sampling_slider = ctk.CTkSlider(self.import_form_frame, from_=1, to=10, variable=self.sampling_interval)
-        self.sampling_slider.pack(pady=10)
-        self.sampling_val_label = ctk.CTkLabel(self.import_form_frame, textvariable=self.sampling_interval)
-        self.sampling_val_label.pack(pady=5)
+        self.import_sampling_slider = ctk.CTkSlider(self.import_form_frame, from_=1, to=10, variable=self.import_sampling_interval, command=self.update_import_sampling_val_label)
+        self.import_sampling_slider.pack(pady=10)
+        self.import_sampling_val_label = ctk.CTkLabel(self.import_form_frame, text="1")
+        self.import_sampling_val_label.pack(pady=5)
 
         ctk.CTkLabel(self.import_form_frame, text="Bit Depth", font=("Helvetica", 16)).pack(pady=10)
-        self.bit_depth_slider = ctk.CTkSlider(self.import_form_frame, from_=1, to=16, variable=self.bit_depth, number_of_steps=16)
-        self.bit_depth_slider.pack(pady=10)
-        self.bit_depth_label = ctk.CTkLabel(self.import_form_frame, textvariable=self.bit_depth)
-        self.bit_depth_label.pack(pady=5)
+        self.import_bit_depth_slider = ctk.CTkSlider(self.import_form_frame, from_=1, to=16, variable=self.import_bit_depth, command=self.update_import_bit_depth_label)
+        self.import_bit_depth_slider.pack(pady=10)
+        self.import_bit_depth_label = ctk.CTkLabel(self.import_form_frame, text="8")
+        self.import_bit_depth_label.pack(pady=5)
 
         ctk.CTkButton(self.import_form_frame, text="Load CSV File", command=self.load_csv_file).pack(pady=10)
         ctk.CTkButton(self.import_form_frame, text="Analog to Digital Conversion", command=lambda: self.analog_to_digital_conversion(self.analog_signal, self.import_plot_frame)).pack(pady=10)
 
+
+    def update_time_vector_label(self, value):
+        self.random_time_vector_label.configure(text=f"{int(value)}")
+
+    def update_random_sampling_val_label(self, value):
+        self.random_sampling_val_label.configure(text=f"{int(value)}")
+
+    def update_random_bit_depth_label(self, value):
+        self.random_bit_depth_label.configure(text=f"{int(value)}")
+
+    def update_import_sampling_val_label(self, value):
+        self.import_sampling_val_label.configure(text=f"{int(value)}")
+
+    def update_import_bit_depth_label(self, value):
+        self.import_bit_depth_label.configure(text=f"{int(value)}")
+
     def generate_random_signal(self):
         time_vector = int(self.time_vector.get())
         time = np.linspace(0, 1, time_vector)
-        self.analog_signal = np.sin(2 * np.pi * np.random.rand(time_vector) * time)
+        num_waves = np.random.randint(10, 50)
+        self.analog_signal = np.zeros(time_vector)
+        for _ in range(num_waves):
+            amplitude = np.random.uniform(0.5, 2.0)
+            frequency = np.random.uniform(0.5, 5.0)
+            phase = np.random.uniform(0, 2*np.pi) 
+            self.analog_signal += amplitude * np.sin(2 * np.pi * frequency * time + phase)
         self.plot_random_signal(self.analog_signal, self.random_plot_frame)
 
     def load_csv_file(self):
@@ -155,8 +180,8 @@ class AnalogToDigitalWindow(ctk.CTk):
         canvas.get_tk_widget().pack()
 
     def analog_to_digital_conversion(self, analog_signal, plot_frame):
-        sampling_interval = self.sampling_interval.get()
-        bit_depth = self.bit_depth.get()
+        sampling_interval = self.random_sampling_interval.get() or self.import_bit_depth_label.get()
+        bit_depth = self.random_bit_depth.get() or self.import_bit_depth.get()
         self.controller.bit_depth = bit_depth
 
         digital_signal, sample_points = self.controller.adc_process(analog_signal, sampling_interval)
