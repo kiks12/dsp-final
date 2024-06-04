@@ -44,13 +44,13 @@ class MainWindow(customtkinter.CTk):
             self.buttons_frame, text="Analog to Digital Conversion", width=300, height=40, corner_radius=10, command=lambda: self.controller.open_analog_digital_window()
         )
         self.fir_button = customtkinter.CTkButton(
-            self.buttons_frame, text="Finite Impulse Response Filter", width=300, height=40, corner_radius=10
+            self.buttons_frame, text="Finite Impulse Response Filter", width=300, height=40, corner_radius=10, command=lambda: self.controller.open_fir_window()
         )
         self.moving_average_button = customtkinter.CTkButton(
             self.buttons_frame, text="Moving Average Filter", width=300, height=40, corner_radius=10, command=lambda: self.controller.open_moving_average_window()
         )
         self.low_high_button = customtkinter.CTkButton(
-            self.buttons_frame, text="Low/High Pass Filter Conversion", width=300, height=40, corner_radius=10
+            self.buttons_frame, text="Low/High Pass Filter Conversion", width=300, height=40, corner_radius=10, command=lambda: self.controller.open_low_high_window()
         )
         self.exit_button = customtkinter.CTkButton(
             self.buttons_frame, text="Exit", width=300, height=40, corner_radius=10, command=lambda: self.controller.exit_app()

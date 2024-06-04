@@ -1,11 +1,7 @@
-
 import sys
 
-from views import MovingAverageWindow
-from views import AnalogToDigitalWindow
-from controllers import MovingAverageController
-from controllers import AnalogToDigitalController
-
+from views import MovingAverageWindow, FIRFilterWindow, LowPassHighPassWindow, AnalogToDigitalWindow
+from controllers import MovingAverageController, FIRFilterController, LowPassHighPassController, AnalogToDigitalController
 
 class MainController:
 
@@ -27,12 +23,17 @@ class MainController:
         self.analog_to_digital_window.mainloop()
 
     def open_fir_window(self):
-        # kabit yung code for opening new window
-        pass
+        fir_filter_controller = FIRFilterController.FIRFilterController()
+        self.fir_filter_window = FIRFilterWindow.FIRFilterWindow(fir_filter_controller)
+        self.fir_filter_window.mainloop()
 
+        
     def open_low_high_window(self):
-        # kabit yung code for opening new window
-        pass
+        self.low_high_controller = LowPassHighPassController.LowPassHighPassController()
+        self.low_high_window = LowPassHighPassWindow.lowPassHighPassWindow(
+            self.low_high_controller
+        )
+        self.low_high_window.mainloop()
 
     def exit_app(self):
         sys.exit()

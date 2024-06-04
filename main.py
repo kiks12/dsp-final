@@ -1,4 +1,3 @@
-
 from views import MainWindow
 from controllers import MainController
 import customtkinter
