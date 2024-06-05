@@ -18,8 +18,8 @@ class AnalogToDigitalWindow(ctk.CTk):
         self.controller = controller
         self.time_vector = tk.IntVar(value=75)
         self.random_sampling_interval = tk.IntVar(value=1)
-        self.import_sampling_interval = tk.IntVar(value=1)
         self.random_bit_depth = tk.IntVar(value=8)
+        self.import_sampling_interval = tk.IntVar(value=1)
         self.import_bit_depth = tk.IntVar(value=8)
         self.file_path = None
 
@@ -104,7 +104,7 @@ class AnalogToDigitalWindow(ctk.CTk):
         self.random_bit_depth_label.pack(pady=5)
 
         ctk.CTkButton(self.random_form_frame, text="Generate Random Signal", command=self.generate_random_signal).pack(pady=10)
-        ctk.CTkButton(self.random_form_frame, text="Analog to Digital Conversion", command=lambda: self.analog_to_digital_conversion(self.analog_signal, self.random_plot_frame)).pack(pady=10)
+        ctk.CTkButton(self.random_form_frame, text="Analog to Digital Conversion", command=lambda: self.random_analog_to_digital_conversion(self.analog_signal, self.random_plot_frame)).pack(pady=10)
 
 
     def create_import_form(self):
@@ -121,7 +121,7 @@ class AnalogToDigitalWindow(ctk.CTk):
         self.import_bit_depth_label.pack(pady=5)
 
         ctk.CTkButton(self.import_form_frame, text="Load CSV File", command=self.load_csv_file).pack(pady=10)
-        ctk.CTkButton(self.import_form_frame, text="Analog to Digital Conversion", command=lambda: self.analog_to_digital_conversion(self.analog_signal, self.import_plot_frame)).pack(pady=10)
+        ctk.CTkButton(self.import_form_frame, text="Analog to Digital Conversion", command=lambda: self.import_analog_to_digital_conversion(self.import_plot_frame)).pack(pady=10)
 
 
     def update_time_vector_label(self, value):
@@ -129,15 +129,19 @@ class AnalogToDigitalWindow(ctk.CTk):
 
     def update_random_sampling_val_label(self, value):
         self.random_sampling_val_label.configure(text=f"{int(value)}")
+        self.random_sampling_interval.set(int(value))
 
     def update_random_bit_depth_label(self, value):
         self.random_bit_depth_label.configure(text=f"{int(value)}")
+        self.random_bit_depth.set(int(value))
 
     def update_import_sampling_val_label(self, value):
         self.import_sampling_val_label.configure(text=f"{int(value)}")
+        self.import_sampling_interval.set(int(value))
 
     def update_import_bit_depth_label(self, value):
         self.import_bit_depth_label.configure(text=f"{int(value)}")
+        self.import_bit_depth.set(int(value))
 
     def generate_random_signal(self):
         time_vector = int(self.time_vector.get())
@@ -155,15 +159,14 @@ class AnalogToDigitalWindow(ctk.CTk):
         file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
         if file_path:
             self.file_path = file_path
-            analog_signal = self.read_csv_file(file_path)
-            self.analog_signal = analog_signal
-            self.plot_random_signal(analog_signal, self.import_plot_frame)
+            self.imported_signal = self.read_csv_file(file_path)  # Store the imported signal
+            self.plot_import_signal(self.imported_signal, self.import_plot_frame)
 
     def read_csv_file(self, file_path):
         with open(file_path, 'r') as file:
             reader = csv.reader(file)
-            analog_signal = np.array([float(row[0]) for row in reader])
-        return analog_signal
+            import_analog_signal = np.array([float(row[0]) for row in reader])
+        return import_analog_signal
     
     def plot_random_signal(self, signal, plot_frame):
         for widget in plot_frame.winfo_children():
@@ -179,9 +182,23 @@ class AnalogToDigitalWindow(ctk.CTk):
         canvas.draw()
         canvas.get_tk_widget().pack()
 
-    def analog_to_digital_conversion(self, analog_signal, plot_frame):
-        sampling_interval = self.random_sampling_interval.get() or self.import_bit_depth_label.get()
-        bit_depth = self.random_bit_depth.get() or self.import_bit_depth.get()
+    def plot_import_signal(self, signal, plot_frame):
+        for widget in plot_frame.winfo_children():
+            widget.destroy()
+        fig, ax = plt.subplots()
+        ax.plot(signal, label='Analog Signal')
+        ax.set_xlabel('Sample Number')
+        ax.set_ylabel('Amplitude')
+        ax.set_title('Signal')
+        ax.grid(True)
+
+        canvas = FigureCanvasTkAgg(fig, master=plot_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
+
+    def random_analog_to_digital_conversion(self, analog_signal, plot_frame):
+        sampling_interval = self.random_sampling_interval.get()
+        bit_depth = self.random_bit_depth.get()
         self.controller.bit_depth = bit_depth
 
         digital_signal, sample_points = self.controller.adc_process(analog_signal, sampling_interval)
@@ -200,6 +217,41 @@ class AnalogToDigitalWindow(ctk.CTk):
         canvas = FigureCanvasTkAgg(fig, master=plot_frame)
         canvas.draw()
         canvas.get_tk_widget().pack()
+
+    def import_analog_to_digital_conversion(self, plot_frame):
+        if self.imported_signal is None:
+            print("No CSV file loaded. Please load a CSV file first.")
+            return
+
+        sampling_interval = self.import_sampling_interval.get()
+        bit_depth = self.import_bit_depth.get()
+        self.controller.bit_depth = bit_depth
+
+        digital_signal, sample_points = self.controller.adc_process(self.imported_signal, sampling_interval)
+
+        for widget in plot_frame.winfo_children():
+            widget.destroy()
+        fig, ax = plt.subplots()
+        ax.plot(self.imported_signal, label='Original Signal')
+        ax.plot(sample_points, digital_signal, label='Encoded Signal', linestyle='--')
+        ax.legend()
+        ax.set_xlabel('Sample Number')
+        ax.set_ylabel('Amplitude')
+        ax.set_title('Analog to Digital Conversion')
+        ax.grid(True)
+
+        canvas = FigureCanvasTkAgg(fig, master=plot_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
+
+    def close_window(self):
+        self.destroy()
+
+if __name__ == "__main__":
+    controller = AnalogToDigitalController()
+    app = AnalogToDigitalWindow(controller)
+    app.mainloop()
+
 
     def close_window(self):
         self.destroy()
