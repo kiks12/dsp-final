@@ -3,9 +3,12 @@ from tkinter import filedialog
 from controllers import FIRFilterController
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import customtkinter as ctk
+from PIL import Image, ImageFilter
+
+EDGE_DETECTION_FILTER = "edge_detection"
+BLUR_DETECTION_FILTER = "blur"
 
 class FIRFilterWindow(ctk.CTk):
-
     def __init__(self, controller):
         super().__init__()
         self.geometry("1000x700")
@@ -37,9 +40,43 @@ class FIRFilterWindow(ctk.CTk):
             self.show_cutoff_selection_dialog(filename)
 
     def open_image_dialog(self):
-        filename = filedialog.askopenfilename()
-        if filename:
-            self.controller.process_image(filename)
+        self.image_filename = filedialog.askopenfilename()
+        if self.image_filename:
+            self.show_filter_selection_dialog()
+
+    def show_filter_selection_dialog(self): 
+        filter_window = ctk.CTkToplevel(self)
+        filter_window.geometry("200x100")
+        filter_window.title("Confirm Filter")
+
+        def confirm_filter():
+            selected_filter = self.filter_var.get()
+            self.controller.process_image(self.image_filename, selected_filter)
+            filter_window.destroy()
+
+        self.filter_var = tk.StringVar()
+        ctk.CTkLabel(filter_window, text = "Choose Filter: ", font = ("Helvica", 14)).pack(pady = 20)
+
+        blur_button = ctk.CTkButton(filter_window, text="Blur")
+        blur_button.pack(pady=10)
+
+        def on_blur_button_click():
+            self.filter_var.set(BLUR_DETECTION_FILTER)
+            blur_button.configure(text="Blur (selected)")
+
+        blur_button.configure(command=on_blur_button_click) 
+
+
+        edge_button = ctk.CTkButton(filter_window, text="Edge Detection")
+        edge_button.pack(pady=10)
+
+        def on_edge_button_click():
+            self.filter_var.set(EDGE_DETECTION_FILTER)
+            edge_button.configure(text="Edge Detection (selected)")
+
+        edge_button.configure(command=on_edge_button_click) 
+
+        ctk.CTkButton(filter_window, text="Confirm", command=confirm_filter).pack(pady=10)
 
     def show_cutoff_selection_dialog(self, filename):
         cutoff_window = ctk.CTkToplevel(self)
