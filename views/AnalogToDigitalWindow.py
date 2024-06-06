@@ -33,7 +33,11 @@ class AnalogToDigitalWindow(ctk.CTk):
     def clear_plots(self):
         for widget in self.random_plot_frame.winfo_children():
             widget.destroy()
+        for widget in self.import_plot_frame.winfo_children():
+            widget.destroy()
         ctk.CTkLabel(self.random_plot_frame, text="Please Generate Data first.").place(
+            relx=0.5, rely=0.5, anchor="center")
+        ctk.CTkLabel(self.import_plot_frame, text="Please Generate Data first.").place(
             relx=0.5, rely=0.5, anchor="center")
 
     def initialize_header(self):
@@ -62,6 +66,7 @@ class AnalogToDigitalWindow(ctk.CTk):
         self.initialize_import_form()
 
         self.tab_view.pack(pady=10, padx=10)
+    # initializes the random form
 
     def initialize_random_form(self):
         self.random_form_frame = ctk.CTkFrame(
@@ -75,6 +80,7 @@ class AnalogToDigitalWindow(ctk.CTk):
 
         self.random_form_frame.grid(column=0, row=0, padx=20)
         self.random_plot_frame.grid(column=1, row=0)
+    # for the import form
 
     def initialize_import_form(self):
         self.import_form_frame = ctk.CTkFrame(
@@ -88,8 +94,10 @@ class AnalogToDigitalWindow(ctk.CTk):
 
         self.import_form_frame.grid(column=0, row=0, padx=20)
         self.import_plot_frame.grid(column=1, row=0)
+    # for the random form
 
     def create_random_form(self):
+        # Sliders for Time Vector
         ctk.CTkLabel(self.random_form_frame, text="Time Vector",
                      font=("Helvetica", 16)).pack(pady=10)
         self.time_vector_slider = ctk.CTkSlider(
@@ -98,7 +106,7 @@ class AnalogToDigitalWindow(ctk.CTk):
         self.random_time_vector_label = ctk.CTkLabel(
             self.random_form_frame, text="75")
         self.random_time_vector_label.pack(pady=5)
-
+        # Sliders for Sampling Interval
         ctk.CTkLabel(self.random_form_frame, text="Sampling Interval",
                      font=("Helvetica", 16)).pack(pady=10)
         self.random_sampling_slider = ctk.CTkSlider(
@@ -107,7 +115,7 @@ class AnalogToDigitalWindow(ctk.CTk):
         self.random_sampling_val_label = ctk.CTkLabel(
             self.random_form_frame, text="1")
         self.random_sampling_val_label.pack(pady=5)
-
+        # Sliders for Bit Depth
         ctk.CTkLabel(self.random_form_frame, text="Bit Depth",
                      font=("Helvetica", 16)).pack(pady=10)
         self.random_bit_depth_slider = ctk.CTkSlider(
@@ -116,11 +124,14 @@ class AnalogToDigitalWindow(ctk.CTk):
         self.random_bit_depth_label = ctk.CTkLabel(
             self.random_form_frame, text="8")
         self.random_bit_depth_label.pack(pady=5)
-
-        ctk.CTkButton(self.random_form_frame, text="Generate Random Signal", command=self.generate_random_signal).pack(pady=10)
-        ctk.CTkButton(self.random_form_frame, text="Analog to Digital Conversion", command=lambda: self.random_analog_to_digital_conversion(self.analog_signal, self.random_plot_frame)).pack(pady=10)
+        # Buttons
+        ctk.CTkButton(self.random_form_frame, text="Generate Random Signal",
+                      command=self.generate_random_signal).pack(pady=10)
+        ctk.CTkButton(self.random_form_frame, text="Analog to Digital Conversion", command=lambda: self.random_analog_to_digital_conversion(
+            self.analog_signal, self.random_plot_frame)).pack(pady=10)
 
     def create_import_form(self):
+        # Slider for Sampling Interval
         ctk.CTkLabel(self.import_form_frame, text="Sampling Interval",
                      font=("Helvetica", 16)).pack(pady=10)
         self.import_sampling_slider = ctk.CTkSlider(
@@ -129,7 +140,7 @@ class AnalogToDigitalWindow(ctk.CTk):
         self.import_sampling_val_label = ctk.CTkLabel(
             self.import_form_frame, text="1")
         self.import_sampling_val_label.pack(pady=5)
-
+        # Slider for Bit Depth
         ctk.CTkLabel(self.import_form_frame, text="Bit Depth",
                      font=("Helvetica", 16)).pack(pady=10)
         self.import_bit_depth_slider = ctk.CTkSlider(
@@ -138,11 +149,13 @@ class AnalogToDigitalWindow(ctk.CTk):
         self.import_bit_depth_label = ctk.CTkLabel(
             self.import_form_frame, text="8")
         self.import_bit_depth_label.pack(pady=5)
+        # Buttons
+        ctk.CTkButton(self.import_form_frame, text="Load CSV File",
+                      command=self.load_csv_file).pack(pady=10)
+        ctk.CTkButton(self.import_form_frame, text="Analog to Digital Conversion",
+                      command=lambda: self.import_analog_to_digital_conversion(self.import_plot_frame)).pack(pady=10)
 
-        ctk.CTkButton(self.import_form_frame, text="Load CSV File", command=self.load_csv_file).pack(pady=10)
-        ctk.CTkButton(self.import_form_frame, text="Analog to Digital Conversion", command=lambda: self.import_analog_to_digital_conversion(self.import_plot_frame)).pack(pady=10)
-
-
+    # Updates the values on the sliders
     def update_time_vector_label(self, value):
         self.random_time_vector_label.configure(text=f"{int(value)}")
 
@@ -161,6 +174,7 @@ class AnalogToDigitalWindow(ctk.CTk):
     def update_import_bit_depth_label(self, value):
         self.import_bit_depth_label.configure(text=f"{int(value)}")
         self.import_bit_depth.set(int(value))
+    # Generates random signal for the user
 
     def generate_random_signal(self):
         time_vector = int(self.time_vector.get())
@@ -174,20 +188,25 @@ class AnalogToDigitalWindow(ctk.CTk):
             self.analog_signal += amplitude * \
                 np.sin(2 * np.pi * frequency * time + phase)
         self.plot_random_signal(self.analog_signal, self.random_plot_frame)
+    # Loads csv file of the user
 
     def load_csv_file(self):
         file_path = filedialog.askopenfilename(
             filetypes=[("CSV files", "*.csv")])
         if file_path:
             self.file_path = file_path
-            self.imported_signal = self.read_csv_file(file_path)  # Store the imported signal
-            self.plot_import_signal(self.imported_signal, self.import_plot_frame)
+            self.imported_signal = self.read_csv_file(
+                file_path)  # Store the imported signal
+            self.plot_import_signal(
+                self.imported_signal, self.import_plot_frame)
+    # reads the csv file
 
     def read_csv_file(self, file_path):
         with open(file_path, 'r') as file:
             reader = csv.reader(file)
             import_analog_signal = np.array([float(row[0]) for row in reader])
         return import_analog_signal
+    # plots the random signal that is generated
 
     def plot_random_signal(self, signal, plot_frame):
         for widget in plot_frame.winfo_children():
@@ -202,6 +221,7 @@ class AnalogToDigitalWindow(ctk.CTk):
         canvas = FigureCanvasTkAgg(fig, master=plot_frame)
         canvas.draw()
         canvas.get_tk_widget().pack()
+    # plots the imported signal that is loaded
 
     def plot_import_signal(self, signal, plot_frame):
         for widget in plot_frame.winfo_children():
@@ -216,8 +236,12 @@ class AnalogToDigitalWindow(ctk.CTk):
         canvas = FigureCanvasTkAgg(fig, master=plot_frame)
         canvas.draw()
         canvas.get_tk_widget().pack()
+    # converts the random signal to digital
 
     def random_analog_to_digital_conversion(self, analog_signal, plot_frame):
+        if analog_signal is None:
+            print("No Generated Signal")
+            return
         sampling_interval = self.random_sampling_interval.get()
         bit_depth = self.random_bit_depth.get()
 
@@ -241,6 +265,7 @@ class AnalogToDigitalWindow(ctk.CTk):
         canvas = FigureCanvasTkAgg(fig, master=plot_frame)
         canvas.draw()
         canvas.get_tk_widget().pack()
+    # converts the imported signal to digital
 
     def import_analog_to_digital_conversion(self, plot_frame):
         if self.imported_signal is None:
@@ -251,13 +276,15 @@ class AnalogToDigitalWindow(ctk.CTk):
         bit_depth = self.import_bit_depth.get()
         self.controller.bit_depth = bit_depth
 
-        digital_signal, sample_points = self.controller.adc_process(self.imported_signal, sampling_interval)
+        digital_signal, sample_points = self.controller.adc_process(
+            self.imported_signal, sampling_interval)
 
         for widget in plot_frame.winfo_children():
             widget.destroy()
         fig, ax = plt.subplots()
         ax.plot(self.imported_signal, label='Original Signal')
-        ax.plot(sample_points, digital_signal, label='Encoded Signal', linestyle='--')
+        ax.plot(sample_points, digital_signal,
+                label='Encoded Signal', linestyle='--')
         ax.legend()
         ax.set_xlabel('Sample Number')
         ax.set_ylabel('Amplitude')
@@ -271,11 +298,11 @@ class AnalogToDigitalWindow(ctk.CTk):
     def close_window(self):
         self.destroy()
 
+
 if __name__ == "__main__":
     controller = AnalogToDigitalController()
     app = AnalogToDigitalWindow(controller)
     app.mainloop()
-
 
     def close_window(self):
         self.destroy()

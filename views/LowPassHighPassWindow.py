@@ -6,7 +6,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import scipy.io.wavfile as wav
 from controllers import LowPassHighPassController
 import numpy as np
-import sys
 
 
 class lowPassHighPassWindow(ctk.CTk):
@@ -25,10 +24,12 @@ class lowPassHighPassWindow(ctk.CTk):
         self.current_filter = None
 
         self.initialize_layout()
+    # initializes the layou
 
     def initialize_layout(self):
         self.initialize_header()
         self.initialize_tabview()
+    # clears the plot
 
     def clear_plots(self):
         for widget in self.filter_plot_frame.winfo_children():
@@ -50,6 +51,7 @@ class lowPassHighPassWindow(ctk.CTk):
         self.clear_button.grid(column=8, row=0, padx=5, pady=10, sticky="e")
         self.quit_button.grid(column=9, row=0, padx=5, pady=10, sticky="e")
         self.header.pack(padx=10, pady=10)
+    # tab view
 
     def initialize_tabview(self):
         self.tab_view = ctk.CTkTabview(
@@ -83,7 +85,7 @@ class lowPassHighPassWindow(ctk.CTk):
         self.cut_off_val_label = ctk.CTkLabel(
             self.filter_form_frame, text="10000")
         self.cut_off_val_label.pack(pady=5)
-
+        # buttons
         ctk.CTkButton(self.filter_form_frame, text="Load Audio File",
                       command=self.load_audio_file).pack(pady=10)
         ctk.CTkButton(self.filter_form_frame, text="Low Pass Filter",
@@ -92,9 +94,11 @@ class lowPassHighPassWindow(ctk.CTk):
                       command=lambda: self.apply_filter('highpass')).pack(pady=10)
         ctk.CTkButton(self.filter_form_frame, text="Save Filtered Audio",
                       command=self.save_filtered_audio).pack(pady=10)
+    # updates the value of the slider
 
     def update_cut_off_slider(self, value):
         self.cut_off_val_label.configure(text=f"{int(value)}")
+    # loads the audio file
 
     def load_audio_file(self):
         file_path = filedialog.askopenfilename(
@@ -105,6 +109,7 @@ class lowPassHighPassWindow(ctk.CTk):
             self.filtered_signal = None
             self.plot_audio_signal(
                 self.audio_signal, None, self.filter_plot_frame)
+    # plots the loaded audio signal
 
     def plot_audio_signal(self, original_signal, filtered_signal, plot_frame):
         for widget in plot_frame.winfo_children():
@@ -136,13 +141,14 @@ class lowPassHighPassWindow(ctk.CTk):
         canvas = FigureCanvasTkAgg(fig, master=plot_frame)
         canvas.draw()
         canvas.get_tk_widget().pack()
+    # applies the filter to the loaded audio
 
     def apply_filter(self, filter_type):
         if self.audio_signal is None:
             return
 
         cutoff_frequency = self.cut_off.get()
-
+        # checks if the user wants lowpass or highpass
         if filter_type == 'lowpass':
             self.filtered_signal = self.controller.lowpass_filter(
                 self.audio_signal, self.sampling_rate, cutoff=cutoff_frequency)
@@ -154,6 +160,7 @@ class lowPassHighPassWindow(ctk.CTk):
 
         self.plot_audio_signal(
             self.audio_signal, self.filtered_signal, self.filter_plot_frame)
+    # saves the filtered audio
 
     def save_filtered_audio(self):
         if self.filtered_signal is not None:
